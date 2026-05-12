@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include <unistd.h>
 
 std::filesystem::path home_path() {
   const char *home_path = std::getenv("HOME");
@@ -25,11 +26,23 @@ std::filesystem::path connections_path() {
 }
 
 void create_config() {
-  std::filesystem::create_directory(sshman_path());
+  if (!std::filesystem::exists(sshman_path()))
+    std::filesystem::create_directory(sshman_path());
   std::ofstream file(config_path());
   file << "##################\n";
   file << "# DEFAULT CONFIG #\n";
   file << "##################\n\n";
   file << "session_timeout=900\n";
   file << "check_online=false\n";
+}
+
+void create_auth() {
+  if (!std::filesystem::exists(sshman_path()))
+    std::filesystem::create_directory(sshman_path());
+  std::filesystem::create_directory(sshman_path() / "auth");
+}
+
+std::filesystem::path session_path() {
+  return std::filesystem::path("/run/user") / std::to_string(getuid()) /
+         "sshman.session";
 }
