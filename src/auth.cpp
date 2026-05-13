@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sodium.h>
+#include <sodium/crypto_pwhash.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -59,5 +61,14 @@ bool login() {
   std::getline(file, stored_hash);
 
   for (int i = 0; i < 3; ++i) {
+    std::string entered_string = read_passwd("Please enter your password: ");
+    if (crypto_pwhash_str_verify(stored_hash.c_str(), entered_string.c_str(),
+                                 entered_string.size()) != 0) {
+      std::cout << "Incorrect password, please try again." << std::endl;
+    } else {
+      create_session(parse_config().session_timeout);
+      return true;
+    }
   }
+  return false;
 }
