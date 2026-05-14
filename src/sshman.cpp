@@ -1,10 +1,8 @@
 #include "auth.h"
 #include "cmd.h"
 
-#include <iostream>
 #include <sodium.h>
 #include <stdexcept>
-#include <string.h>
 
 int main(int argc, char *argv[]) {
   if (sodium_init() < 0)
@@ -22,6 +20,8 @@ int main(int argc, char *argv[]) {
       std::string name = argv[i + 1];
       cmd_connect(name);
       ++i;
+    } else if (a == "-n" || a == "--new") {
+      cmd_new();
     }
   }
 

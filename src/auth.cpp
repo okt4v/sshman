@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sodium.h>
 #include <sodium/crypto_pwhash.h>
+#include <stdexcept>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -28,11 +29,12 @@ std::string read_passwd(const std::string &prompt) {
   return passwd;
 }
 
-void create_session(int session_timeout) {
+void create_session() {
+  Config config = parse_config();
   std::ofstream file(session_path());
   if (!file.is_open())
     return;
-  file << std::time(nullptr) + parse_config().session_timeout;
+  file << std::time(nullptr) + config.session_timeout;
   std::filesystem::permissions(session_path(),
                                std::filesystem::perms::owner_read |
                                    std::filesystem::perms::owner_write,
@@ -58,6 +60,8 @@ bool login() {
   std::filesystem::path passwd_file = sshman_path() / "auth" / "passwd";
   std::string stored_hash;
   std::ifstream file(passwd_file);
+  if (!file.is_open())
+    throw std::runtime_error("Failed to read password hash from disk");
   std::getline(file, stored_hash);
 
   for (int i = 0; i < 3; ++i) {
@@ -66,7 +70,7 @@ bool login() {
                                  entered_string.size()) != 0) {
       std::cout << "Incorrect password, please try again." << std::endl;
     } else {
-      create_session(parse_config().session_timeout);
+      create_session();
       return true;
     }
   }

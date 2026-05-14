@@ -46,3 +46,11 @@ std::filesystem::path session_path() {
   return std::filesystem::path("/run/user") / std::to_string(getuid()) /
          "sshman.session";
 }
+
+void create_storage() {
+  std::filesystem::create_directory(sshman_path());
+  std::ofstream file(sshman_path() / "connections.csv");
+  if (!file.is_open())
+    throw std::runtime_error("Connections could not be stored from disk");
+  file << "Name,Ip,Port,User,Password,Last-Connect,First-Connect\n";
+}

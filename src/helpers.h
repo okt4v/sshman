@@ -11,3 +11,4 @@ std::filesystem::path session_path();
 
 void create_config();
 void create_auth();
+void create_storage();

@@ -5,3 +5,4 @@
 
 void cmd_list();
 void cmd_connect(std::string name);
+void cmd_new();

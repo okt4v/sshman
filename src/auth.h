@@ -6,4 +6,4 @@
 std::string read_passwd(const std::string &prompt);
 bool login();
 bool session_valid();
-void create_session(int session_timeout);
+void create_session();
